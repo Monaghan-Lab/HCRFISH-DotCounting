@@ -1,0 +1,243 @@
+---
+title: "Visualization and Statistical Analysis of FISH Count Data"
+output: 
+  html_document:
+    toc: TRUE
+    toc_depth: 6
+---
+
+## Overview
+This script takes all of the measurement files output by your ROI conversions, compiles them into one dataframe using information derived from the file names, outputs violin plots overlaid on dot plots, and runs clustered Wilcoxon rank-sum tests on the data for significance. Included are step-by-step instructions breaking down what needs to be edited and/or what can be tailored to your particular goals. An attempt was made to limit the programming experience needed to run this pipeline, but some familiarity with R and RStudio is helpful. Links to documentation are included where relevant to aid in any editing that might need to be done. If you have questions, suggestions for improvement, or requests for new features / capabilities, you can reach out in the GitHub page issues or using the lab email address provided in the GitHub organization.
+
+Make sure that this script is in the same folder as the folder output by the ROI conversion containing your measurement files, __not__ within the same directory as the measurement files. Because the information needed for plotting and analysis is taken from the file names themselves, it is highly recommended that your measurement file names are as descriptive as possible, with underscores separating different relevant keys, and dashes acting as "spaces" in multi-word keys. There is an example in the "File name information" chunk. 
+
+## Setup and Library
+Nothing needs to be edited here, but you may need to install packages if you don't already have them.
+```{r setup, include=FALSE}
+# You can ignore this chunk - it affects what information is rendered in the output HTML
+knitr::opts_chunk$set(echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE)
+```
+```{r library}
+# If you don't have any of these installed, you can use: install.packages("<package-name>")
+# e.g. install.packages("dplyr")
+library(tools)
+library(tidyverse) # contains ggplot
+library(dplyr)
+library(clusrank)
+```
+
+## Defining your genes, tissues, etc. - Lots of editing here! 
+### Genes & tissues
+Edit the lists and values below to reflect the information you are interested in analyzing. You can add more values to the `genes` and `tissues` lists.
+```{r define_genes}
+genes <- c("Gene1", "Gene2", "Gene3")
+```
+```{r define_tissues}
+tissues <- c("Tissue1", "Tissue2", "Tissue3")
+```
+```{r define_filter}
+# Set the filter below to select only ROIs with meaningful area - this threshold is left up to judgment 
+# Small ROIs may be segmentation errors or irrelevant debris
+area_minimum <- 0
+```
+
+### File path
+Edit the `dataPath` below to point to the folder containing the measurement files. This might be `./output`, etc., whatever you chose to name it. Make sure to include the leading `./`, which might be `.\` on Windows. Spaces or special characters in your folder name may give you problems!
+```{r define_data}
+# The directory containing the files
+dataPath <- "./measurements"
+
+# Does not need to be edited - creates a list of the files to loop through below
+# If this script is in the same folder as the measurement files, any re-running will ALSO include the all_ROI_data.csv created below due to the *.csv in the path glob.
+dataFiles <- Sys.glob( file.path( dataPath, "*.csv" ) )
+```
+```{r test_loop}
+# To check if the compilation loop will pick up the right files, run this loop:
+for(file in dataFiles){
+  print(file)
+}
+```
+
+### Measurement file column headers
+Look at the column names of your output measurement files, and edit this list if they are different. `ROI_Number` populates the empty column header in the measurement file, so always have this one first; aside from `ROI_Number`, your measurement files should minimally also include columns `Area` and `RawIntDen`.  
+```{r column_names}
+column_names <- c("ROI_Number", "Label", "Area", "IntDen", "RawIntDen")
+```
+
+### File name information
+The loop below uses the names of your measurement files to gather information relevant to the plotting function. In order to facilitate getting this information, please edit below accordingly, and make sure your files are named appropriately. The comments provide an example.
+```{r define_conditions_and_fileInfo}
+# Example file: 14DPA_Distal-DMSO_Hoxa9-Hoxa11-Hoxa13_Animal1_Hoxa9_Blastema.csv
+# Note that each multiple-word value is separated by a dash (-), whereas different values are separated by an underscore (_)
+
+# You can change these strings to whatever is relevant to your conditions
+condition1 <- as.name("Condition1")
+condition1_position <- 1 # 14DPA
+
+condition2 <- as.name("Condition2")
+condition2_position <- 2 # Distal-DMSO
+# if you have more than two conditions, you can continue with this pattern - you will need to edit the compilation and plotting loops
+
+geneSet_position <- 3 # Hoxa9-Hoxa11-Hoxa13
+sampleNumber_position <- 4 # Animal1
+geneName_position <- 5 # Hoxa9
+tissue_position <- 6 # Blastema
+```
+
+## Loop to compile measurement files
+If you have fewer or more than two conditions that you defined above, you will need to edit this loop where indicated.
+```{r allData}
+# Initializing empty dataframe to contain all measurement data
+allData <- data.frame()
+```
+```{r compilation_loop}
+for (csv in dataFiles){
+  # Stripping extension and path to make extracting info from filename easier
+  baseFilename <- basename( file_path_sans_ext(csv) )
+  
+  # Cleaning up input data and creating new columns to help with plotting
+  df <- read_csv(csv, col_names = TRUE, show_col_types = FALSE) %>%
+    drop_na() %>%
+    `colnames<-`(column_names) %>% # Renaming columns to those listed above, pretty much just to give the "ROI_Number" column a header
+    filter(Area >= area_minimum) %>%
+    select(ROI_Number, RawIntDen) %>% # These are the only columns we care about
+    mutate(
+      "{condition1}" := unlist( str_split( baseFilename, "_") )[[condition1_position]],
+      "{condition2}" := unlist( str_split( baseFilename, "_") )[[condition2_position]], 
+      # If you wanted to add more conditions, the format would be:
+      # "{conditionN}" := unlist( str_split( baseFilename, "_") )[[conditionN_position]],
+      Gene_Set = unlist(str_split(baseFilename, "_"))[[geneSet_position]],
+      Sample = unlist(str_split( baseFilename, "_"))[[sampleNumber_position]],
+      Gene = unlist( str_split( baseFilename, "_" ) )[[geneName_position]],
+      Tissue = unlist( str_split( baseFilename, "_" ) )[[tissue_position]],
+      Dots_in_ROI = RawIntDen / 255)
+  allData <- rbind(allData, df)
+}
+```
+```{r write_allData}
+# Writes csv to current working directory
+# Make sure your working directory is NOT the folder containing the measurement files
+# If it is, a later run of this script will try to include the "all_ROI_data.csv" as a measurement!
+
+# This WILL overwrite if this file already exists in this location
+write_csv(allData, file = "all_ROI_data.csv")
+```
+
+## Plotting data
+This loop uses `ggplot` to create violin plots overlaid on dot plots, where each dot is an individual ROI from your segmentation plotted against a y-axis of the number of dots detected in that ROI. By default the plots are placed into facet grids separated by tissue types, colored by these tissue types, and grouped within each facet panel by the `condition1` and `condition2` defined above. The default max y-value is 50.
+
+You will notice several points in the plotting loop where there is a `!!` followed by a `conditionN`. This will automatically populate the indicated groupings, aesthetics, etc., with the conditions you specified above the compilation loop. If you want different groupings, coloration, etc., or to include a 3rd or higher condition, you can change the `N` as needed to reflect what you have defined and/or are interested in visualizing.
+
+There are many other components in ggplot that can be added, removed, and tailored to what you want to visualize, way more than can be reasonably broken down in this example. The information on these components can be found in [the ggplot documentation](https://ggplot2.tidyverse.org).
+```{r plotting_loop}
+for(gene in genes){
+  chart_data <- allData %>% filter(Gene==gene)
+  
+  # Optional - if you'd like to change the y-axis scale of your charts for individual genes, you can un-comment and edit these if-else statements
+  # You can also continue with the "else if" conditions if you'd like to add more genes. The default max is 50.
+  ymax <- 50
+  # if(gene=="Gene1"){
+  #  ymax <- 50
+  #} else if(gene=="Gene2"){ 
+  #  ymax <- 50
+  #} else{
+  #    ymax <- 50
+  #  }
+  
+  plot <- chart_data %>%
+    ggplot( aes(x = !!condition2, # You can change this if your preferred x-grouping isn't necessarily condition 2
+               y = Dots_in_ROI,
+               color = Tissue, # You can also change this to a !!conditionN of interest
+               alpha = Dots_in_ROI, # Sets the opacity of the dots such that lower ROI values are more transparent
+               group = interaction(!!condition1, ## These interactions can be edited as well - be careful, because it can affect faceting & summary points
+                                   Tissue, 
+                                   !!condition2) ) ) +
+    # Adds the dot plot with some random jitter between points
+    geom_point(position = position_jitterdodge(jitter.height = 0.5, 
+                                             jitter.width = 0.2) ) +
+    # Splits plots into columns by tissue type - this can be changed to a different !!conditionN of interest
+    facet_grid(cols = vars(Tissue), 
+               scales = "free", 
+               space = "free") +
+    # Adds the violin plot
+    geom_violin(scale = "count",
+                trim = TRUE,
+                alpha = 0.8,
+                position = position_dodge(1.0),
+                bw = 1,
+                aes(color = !!condition2) ) +
+    # The following stat_summary functions plot median and mean points
+    stat_summary(fun = "median", 
+                 geom = "point", 
+                 size = 0.5, 
+                 color = "black") +
+    stat_summary(fun = "mean", 
+                 geom = "point", 
+                 color = "black", 
+                 fill = "white", 
+                 shape = 23, 
+                 size = 1, 
+                 alpha = 1, 
+                 position = position_dodge(width = 0.75) ) +
+    scale_alpha_continuous() +
+    # If you update the ymax above this will be used automatically
+    coord_cartesian(ylim = c(0, ymax) ) +
+    # You can change from "none" if you do want to show a legend for any of these 
+    guides(alpha = "none", 
+           shape = "none", 
+           color = "none") +
+    labs(y = "Dots in ROI",
+         x = condition1, # Change if you changed x above to something else
+         title = paste(gene, "Expression") ) +
+    theme(strip.text.x = element_text(size = 14, 
+                                      face = "bold") ) # Sets the style of the text above each facet column
+  print(plot)
+}
+```
+
+## Clustered Wilcoxon rank-sum tests
+Because the measurements are taken from many different cells within a single tissue, treating each cell as its own "n" violates an assumption of independence and is likely to lead to extreme significance where there isn't any. More information on analyzing "clustered" data such as that here can be found in these two papers, as well as others: (https://doi.org/10.1186/s12868-015-0228-5), (https://doi.org/10.1523/JNEUROSCI.0362-10.2010). 
+
+To analyze the data, a clustered Wilcoxon rank-sum or signed-rank test is implemented with the `clusrank` package (https://doi.org/10.18637/jss.v096.i06), (https://cran.r-project.org/web/packages/clusrank/index.html). The test shown below is populated with default values using the S3 method, but of course many of these settings can be changed to be more appropriate to your use. The documentation for this package and how to use it can be found here (https://cran.r-project.org/web/packages/clusrank/clusrank.pdf).
+```{r wilcoxTests}
+# Will loop through all genes and go tissue-by-tissue to find differences between groups WITHIN that tissue.
+# If doing cross-tissue comparison, you will need to look at the clusrank documentation to determine the right settings.
+# The clusrank package also has support for pairwise testing and p-adjustment if you are doing many tests. 
+
+# Will print the p value of the test to 5 digits. To see the entire test object, 
+# remove anything preceding the "clusWilcox.test" function and the trailing "$..."
+
+for(gene in genes){
+  for(tissue in tissues){
+    wilcoxData <- allData %>%
+      # Selects relevant rows for each run
+      filter(Gene == gene, 
+             Tissue == tissue) %>%
+      # optional - creates a NEW column, Cluster, indicating which cell measurements belong to which sample
+      # Useful for if you have e.g. a "Sample_1" in both "Control" and "Treatment" conditions - will create a unique cluster ID for each
+      # unite(Cluster, 
+      #      c("{condition1}", "{Sample}"), # Can add more conditions 
+      #      sep = "_", 
+      #      remove = FALSE) %>%
+      mutate( Cluster = as.numeric(as.factor(Sample)), # Change Sample to Cluster if you used the above unite function
+             condition1 := as.numeric(as.factor(!!condition1)),
+             condition2 := as.numeric(as.factor(!!condition2)) ) # You can add additional conditions as needed
+    
+    print(paste(gene,"in", tissue, ":",
+              format( clusWilcox.test(Dots_in_ROI, 
+                                      y = NULL,
+                                      cluster = Cluster,
+                                      group = condition1, #  can change both group and stratum to a conditionN as appropriate
+                                      stratum = NULL,
+                                      data = wilcoxData, # Formatted dataframe created above
+                                      mu = 0,
+                                      paired = FALSE,
+                                      exact = FALSE,
+                                      method = "ds",
+                                      B = 2000,
+                                      alternative = "two.sided"
+                                      )$p.value, digits = 5) ) )
+
+  }
+}
+```

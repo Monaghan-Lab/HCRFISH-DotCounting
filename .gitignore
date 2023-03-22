@@ -1,0 +1,14 @@
+*.*
+.DS_Store
+.Rhistory
+.ipynb_checkpoints
+!Data_Concatenation_Walkthrough.Rmd
+!*.gitignore
+!*.md
+!*.jpg
+!*.png
+!*.ipynb
+!*.txt
+!*.bib
+!*.py
+!*.sh
