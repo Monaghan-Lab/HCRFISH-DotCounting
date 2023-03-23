@@ -16,28 +16,26 @@ Using the ROI converter
 
 ## Overview
 
-This is the final step in collecting counts of dots from HCR-FISH images
-(Choi et al. (2018)). Briefly, you will use the [maxima images created
-in a previous step](./RS_FISH_Analysis.md), then overlay [your
-segmentation result outlines](./Cellpose_Segmentation.md) onto this
-image to get measurements of the dots in each nucleus or cell.
+This is the final step in collecting counts of dots from HCR-FISH
+images. Briefly, you will use the [maxima images created in a previous
+step](./RS_FISH_Analysis.md), then overlay [your segmentation result
+outlines](./Cellpose_Segmentation.md) onto this image to get
+measurements of the dots in each nucleus or cell.
 
 ## Cellpose single-image ROI converter
 
 **With your maxima image open**, make sure your ROI-Manager is cleared
 of any previous ROIs. You can do this simply by closing the ROI-Manager
-window if it is open. Open `File >> New >> Script...` and a window will
+window if it is open. Open `File > New > Script...` and a window will
 open like this: <img src="./img/New_Script.png" width="2322" />
 
 Go to `Language` and make sure `Python` is selected. Now go to the
-Cellpose (Stringer et al. (2021), Pachitariu and Stringer (2022)) Github
-page and copy-and-paste [the ImageJ ROI Converter
+Cellpose Github page and copy-and-paste [the ImageJ ROI Converter
 macro](https://github.com/MouseLand/cellpose/blob/main/imagej_roi_converter.py)
-into this screen or download the file and open it in FIJI (Schindelin et
-al. (2012)). Then click `Run`. If all goes smoothly, you’ll be prompted
-to choose the text outlines pertaining to that image. These ROIs will
-automatically populate the ROI Manager and overlay onto your maxima
-image:
+into this screen or download the file and open it in FIJI. Then click
+`Run`. If all goes smoothly, you’ll be prompted to choose the text
+outlines pertaining to that image. These ROIs will automatically
+populate the ROI Manager and overlay onto your maxima image:
 <img src="./img/10DPA_Distal_DMSO_Cyp26b1_Cyp26a1_Crabp2_Animal7_Whole_Limb_Crabp2_Maxima_With_Outlines.png" width="7900" />
 
 You can uncheck the `Labels` box in the ROI Manager to assess the
@@ -45,14 +43,15 @@ segmentation results more easily. If the results don’t look spectacular,
 you might want to [go back and edit the segmentation
 parameters](./Cellpose_Segmentation.md) you set to get these outlines.
 
-Go to `Analyze >> Set Measurements...`. You can measure whatever you
+Go to `Analyze > Set Measurements...`. You can measure whatever you
 want, but what we’re interested in is `Label`, `Area` and
 `Integrated density`, so make sure at least those boxes are ticked, and
 hit `OK`. Then in the ROI Manager, hit `Measure`. A window will pop up
 with the measurements from that image, which you should save as a `.csv`
-corresponding to the original image, the gene, and the tissue. For
-example, we might have
-`10DPA_Distal_DMSO_Cyp26b1_Cyp26a1_Crabp2_Animal5_Crabp2_Blastema.csv`.
+corresponding to the original image, the gene, and the tissue.
+
+For example, we might have
+`10DPA_Distal-DMSO_Cyp26b1-Cyp26a1-Crabp2_Animal5_Crabp2_Blastema.csv`.
 The raw integrated density (`RawIntDen`) for each ROI indicates how many
 dots were in a given cell multiplied by 255. This is from the earlier
 `Find Maxima`, when each identified FISH dot became a single pixel with
@@ -102,17 +101,14 @@ files if they match in name) directory where all of the measurements
 files will populate.
 
 There are a few things in the batch converter that you will need to edit
-for your personal usage:
+for your personal use:
 
-- At line 13, the `tissues` list currently contains the three regions of
-  a tissue that our group is typically interested in. Change these out
-  to reflect your (`-` separated single-string) regions of interest.
-  This might instead be something like
-  `("Ventral-Mesenchyme", "Distal", "Proximal-Nail")`.
-- At line 15, the `stain` string is currently set to the nuclear stain
-  DAPI. If you used a different stain or fluorophore for the given image
-  and outlines, such as WGA or GFP, you should update this to reflect
-  that. If your stain is multiple words, again connect them with a `-`.
+- At line 13, change the `tissues` list to reflect your (`-` separated
+  single-string) regions of interest. This might instead be something
+  like `("Ventral-Mesenchyme", "Distal", "Proximal-Nail")`.
+- At line 15, the `stain` should be the one used for the given image and
+  outlines, such as WGA or GFP. If your stain is multiple words, again
+  connect them with a `-`.
 - If you are running on Windows, you may need to change the `/` in line
   47 to `\`.
 
@@ -128,17 +124,18 @@ drug treatment. We also do three-gene FISH with a DAPI nuclear stain,
 and have multiple biological replicates. So an example for ours might
 be:
 
-- `14DPA_Distal_DMSO_Hoxa9_Hoxa11_Hoxa13_Animal1_Whole_Tissue_Hoxa9_Maxima.tif`
-- `14DPA_Distal_DMSO_Hoxa9_Hoxa11_Hoxa13_Animal1_Blastema_DAPI_cp_outlines.txt`
+- `14DPA_Distal-DMSO_Hoxa9-Hoxa11-Hoxa13_Animal1_Whole_Tissue_Hoxa9_Maxima.tif`
+- `14DPA_Distal-DMSO_Hoxa9-Hoxa11-Hoxa13_Animal1_Blastema_DAPI_cp_outlines.txt`
 
 This pairing will measure the dots/transcripts of Hoxa9 that were
-identified in the limb blastema. The batch converter loops through your
-directory of maxima images and text outlines, matches each outlines file
-to its respective maxima image, and takes the measurements. It then
-outputs a `.csv` results file that is named to reflect the input maxima
-and outlines. With the above maxima and outlines, for example, the batch
-converter will output
-`14DPA_Distal_DMSO_Hoxa9_Hoxa11_Hoxa13_Animal1_Hoxa9_Blastema.csv`.
+identified specifically in the limb blastema. The batch converter loops
+through your directory of maxima images and text outlines, matches each
+outlines file to its respective maxima image, and takes the
+measurements. It then outputs a `.csv` results file in your selected
+output folder that is named to reflect the input maxima and outlines.
+With the above maxima and outlines, for example, the batch converter
+will output
+`14DPA_Distal-DMSO_Hoxa9-Hoxa11-Hoxa13_Animal1_Hoxa9_Blastema.csv`.
 
 ## What to do now
 

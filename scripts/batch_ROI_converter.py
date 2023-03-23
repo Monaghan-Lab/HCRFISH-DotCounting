@@ -9,10 +9,14 @@ from java.awt import FileDialog
 import os
 import re
 
+#####
+# This script is a modification of the individual ROI converter created by Cellpose.
+#####
+
 # Edit to contain tissue types of interest
-tissues = ("Blastema", "Epithelium", "Mesenchyme")
+tissues = ("Tissue1", "Tissue2", "Tissue3")
 # Edit to be stain used for segmentation
-stain = "DAPI"
+stain = "Stain"
 
 # Need to call the ROI Manager to open
 RM = RoiManager()

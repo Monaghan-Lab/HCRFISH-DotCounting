@@ -7,9 +7,15 @@ output:
 ---
 
 ## Overview
-This script takes all of the measurement files output by your ROI conversions, compiles them into one dataframe using information derived from the file names, outputs violin plots overlaid on dot plots, and runs clustered Wilcoxon rank-sum tests on the data for significance. Included are step-by-step instructions breaking down what needs to be edited and/or what can be tailored to your particular goals. An attempt was made to limit the programming experience needed to run this pipeline, but some familiarity with R and RStudio is helpful. Links to documentation are included where relevant to aid in any editing that might need to be done. If you have questions, suggestions for improvement, or requests for new features / capabilities, you can reach out in the GitHub page issues or using the lab email address provided in the GitHub organization.
+This script takes all of the measurement files output by your ROI conversions, compiles them into one dataframe using information derived from the file names, outputs violin plots overlaid on dot plots, and runs clustered Wilcoxon rank-sum tests on the data for significance. Included are step-by-step instructions breaking down what needs to be edited and/or what can be tailored to your particular goals. An attempt was made to limit the programming experience needed to run this pipeline, but some familiarity with R and RStudio is helpful. 
 
-Make sure that this script is in the same folder as the folder output by the ROI conversion containing your measurement files, __not__ within the same directory as the measurement files. Because the information needed for plotting and analysis is taken from the file names themselves, it is highly recommended that your measurement file names are as descriptive as possible, with underscores separating different relevant keys, and dashes acting as "spaces" in multi-word keys. There is an example in the "File name information" chunk. 
+Links to documentation are included where relevant to aid in any editing that might need to be done. 
+If you have questions, suggestions for improvement, or requests for new features / capabilities, you can reach out in the GitHub page issues or using the lab email address provided in the GitHub organization.
+
+Make sure that this script is in the same folder as the folder output by the ROI conversion containing your measurement files, __not__ within the same directory as the measurement files. 
+Because the information needed for plotting and analysis is taken from the file names themselves, it is highly recommended that your measurement file names are as descriptive as possible.
+Underscores should separate different relevant keys, with dashes acting as "spaces" in multi-word keys.
+There is an example in the "File name information" chunk. 
 
 ## Setup and Library
 Nothing needs to be edited here, but you may need to install packages if you don't already have them.
@@ -196,7 +202,7 @@ for(gene in genes){
 ```
 
 ## Clustered Wilcoxon rank-sum tests
-Because the measurements are taken from many different cells within a single tissue, treating each cell as its own "n" violates an assumption of independence and is likely to lead to extreme significance where there isn't any. More information on analyzing "clustered" data such as that here can be found in these two papers, as well as others: (https://doi.org/10.1186/s12868-015-0228-5), (https://doi.org/10.1523/JNEUROSCI.0362-10.2010). 
+Because the measurements are taken from many different cells within a single sample, treating each cell as its own "n" violates an assumption of independence and is likely to lead to extreme significance where there isn't any. More information on analyzing "clustered" data such as that here can be found in these two papers, as well as others: (https://doi.org/10.1186/s12868-015-0228-5), (https://doi.org/10.1523/JNEUROSCI.0362-10.2010). 
 
 To analyze the data, a clustered Wilcoxon rank-sum or signed-rank test is implemented with the `clusrank` package (https://doi.org/10.18637/jss.v096.i06), (https://cran.r-project.org/web/packages/clusrank/index.html). The test shown below is populated with default values using the S3 method, but of course many of these settings can be changed to be more appropriate to your use. The documentation for this package and how to use it can be found here (https://cran.r-project.org/web/packages/clusrank/clusrank.pdf).
 ```{r wilcoxTests}
@@ -207,6 +213,13 @@ To analyze the data, a clustered Wilcoxon rank-sum or signed-rank test is implem
 # Will print the p value of the test to 5 digits. To see the entire test object, 
 # remove anything preceding the "clusWilcox.test" function and the trailing "$..."
 
+# For the test to work I couldn't auto-populate the group and stratum flags with
+# the previously defined conditions as above and had to instead create new columns in 
+# the input df literally named "column1" etc. I hope to modify this soon.
+# For now, as a reminder of what these conditions were, you can run these print statements.
+print(condition1)
+print(condition2)
+
 for(gene in genes){
   for(tissue in tissues){
     wilcoxData <- allData %>%
@@ -216,14 +229,14 @@ for(gene in genes){
       # optional - creates a NEW column, Cluster, indicating which cell measurements belong to which sample
       # Useful for if you have e.g. a "Sample_1" in both "Control" and "Treatment" conditions - will create a unique cluster ID for each
       # unite(Cluster, 
-      #      c("{condition1}", "{Sample}"), # Can add more conditions 
+      #      c("{condition1}", "{Sample}"), # Can change or add more conditions 
       #      sep = "_", 
       #      remove = FALSE) %>%
       mutate( Cluster = as.numeric(as.factor(Sample)), # Change Sample to Cluster if you used the above unite function
              condition1 := as.numeric(as.factor(!!condition1)),
-             condition2 := as.numeric(as.factor(!!condition2)) ) # You can add additional conditions as needed
+             condition2 := as.numeric(as.factor(!!condition2)) ) # You can change or add additional conditions as needed
     
-    print(paste(gene,"in", tissue, ":",
+    print(paste(gene, "in", tissue, ":",
               format( clusWilcox.test(Dots_in_ROI, 
                                       y = NULL,
                                       cluster = Cluster,

@@ -4,6 +4,11 @@ from ij.gui import PolygonRoi
 from ij.gui import Roi
 from java.awt import FileDialog
 
+#####
+# This is a copy of the ROI converter written by the Cellpose authors.
+# https://github.com/MouseLand/cellpose/blob/main/imagej_roi_converter.py 
+#####
+
 fd = FileDialog(IJ.getInstance(), "Open", FileDialog.LOAD)
 fd.show()
 file_name = fd.getDirectory() + fd.getFile()
