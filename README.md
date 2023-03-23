@@ -7,7 +7,7 @@ Briefly, the steps are as follows:
   2. [Segment cells and/or nuclei in tissues of interest](./Cellpose_Segmentation.md) using [Cellpose](https://github.com/MouseLand/cellpose).
   3. Identify dots with [the RS-FISH plugin](https://github.com/PreibischLab/RS-FISH) and [convert images into binary maxima images](./RS_FISH_Analysis.md).
   4. Overlay segmentation results on maxima images to [get measurements of dots per cell/nucleus](./ROI_Converters.md).
-  5. [Create visualizations and run statistical analyses](./Data_Concatenation_Walkthrough.Rmd). Note that this RMarkdown file will need to be downloaded and run locally.
+  5. [Create visualizations and run statistical analyses](./Data_Concatenation_Walkthrough.Rmd). Note that this RMarkdown file will need to be downloaded and ran locally.
   
 If you find this repository useful or use our method in any of your work, please cite us :-) This method is currently unpublished outside of this repository, but we will update the citation when that is the case. As this pipeline utilizes techniques and software designed by other labs, be sure to cite them as well. Citations and links to their sources are contained in the relevant pipeline steps. 
 
