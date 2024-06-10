@@ -1,20 +1,16 @@
 Image pre-processing and specifying areas of interest
 ================
 
-- <a href="#overview" id="toc-overview">Overview</a>
-- <a href="#steps" id="toc-steps">Steps</a>
-  - <a href="#inspecting-your-image"
-    id="toc-inspecting-your-image">Inspecting your image</a>
-  - <a href="#split-the-image-channels-in-multi-channel-images"
-    id="toc-split-the-image-channels-in-multi-channel-images">Split the
-    image channels in multi-channel images</a>
-  - <a href="#isolate-areas-of-interest-using-the-freehand-tool"
-    id="toc-isolate-areas-of-interest-using-the-freehand-tool">Isolate areas
-    of interest using the freehand tool</a>
-    - <a href="#further-example" id="toc-further-example">Further example</a>
-  - <a href="#resulting-output" id="toc-resulting-output">Resulting
-    output</a>
-- <a href="#references" id="toc-references">References</a>
+- [Overview](#overview)
+- [Steps](#steps)
+  - [Inspecting your image](#inspecting-your-image)
+  - [Split the image channels in multi-channel
+    images](#split-the-image-channels-in-multi-channel-images)
+  - [Isolate areas of interest using the freehand
+    tool](#isolate-areas-of-interest-using-the-freehand-tool)
+    - [Example of more tissues](#example-of-more-tissues)
+  - [Resulting output](#resulting-output)
+- [References](#references)
 
 ### Overview
 
@@ -50,8 +46,8 @@ tiles stitched to produce a single-plane, four-channel image.
 2.  Click `OK`. You can ignore warning messages that pop up in the
     `Console` window. The colors might not be very bright, and that’s
     okay. You can adjust the brightness for visualization with the
-    `Image > Adjust > Brightness & Contrast` window in FIJI. **DO NOT**
-    click `Apply` - this will change the actual pixel intensities.
+    `Image > Adjust > Brightness & Contrast` window in FIJI. Don’t click
+    `Apply` - this will change the actual pixel intensities.
 
 <img src="./img/open_image.png" width="500" style="display: block; margin: auto;" />
 
@@ -63,11 +59,12 @@ tiles stitched to produce a single-plane, four-channel image.
 <img src="./img/bad_stitch.png" width="350" style="display: block; margin: auto;" />
 
 If this stitching error is not in an area of the tissue that you are
-interested in measuring, it can be ignored; otherwise, do not go further
-with this image - it will need to be re-stitched. If you encounter the
-following “walls of color” with or without evident seams like below,
-this is **not a problem** again if the bad stitch is not on the tissue
-(note the faint tile boundaries in the right-center tile):
+interested in measuring, and the image has no other issues, it can be
+ignored; otherwise, do not go further with this image - it will need to
+be re-stitched. If you encounter the following view with or without
+evident seams like below, this is **not a problem** again if the bad
+stitch is not on the tissue (note the faint tile boundaries in the
+right-center tile):
 
 <img src="./img/color_wall.png" width="500" style="display: block; margin: auto;" />
 
@@ -87,7 +84,7 @@ brighter):
     (`File > Save As > Tiff...`). Name each of these images with the
     original file name,
     e.g. `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5`, but add
-    `_Whole_Tissue_GeneName.tif` at the end. FIJI will automatically add
+    `_Whole-Tissue_GeneName.tif` at the end. FIJI will automatically add
     a channel number like `C1-` to the beginning of each file, so be
     sure to also delete this. `GeneName` should align with whatever gene
     was imaged in that channel, chosen before starting HCR-FISH.
@@ -107,10 +104,10 @@ gene names in order. In this example, with
 **At the end of step 5** you should now have one new `.tif` file for
 each channel of your original image. In this example, they are:
 
-- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole_Tissue_Raldh1.tif`
-- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole_Tissue_Raldh2.tif`
-- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole_Tissue_Raldh3.tif`
-- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole_Tissue_DAPI.tif`
+- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole-Tissue_Raldh1.tif`
+- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole-Tissue_Raldh2.tif`
+- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole-Tissue_Raldh3.tif`
+- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole-Tissue_DAPI.tif`
 
 Close all of these except for the image corresponding to your nuclear or
 cytoplasm stain.
@@ -147,7 +144,7 @@ cytoplasm stain.
   `Edit > Selection > Restore Selection`, and then `Edit > Clear`. An
   example of this is below with two other tissues we are interested in.
 
-##### Further example
+##### Example of more tissues
 
 9.  Using the freehand tool, draw along the inner edge of the epithelium
     and around the mesenchyme:
@@ -175,18 +172,18 @@ In this example, this is
 After all of these steps, you should now have the following images:
 
 1.  The **original** unaltered image in `.czi` format. There will be
-    nothing further done with this image, so you can go ahead and just
-    store it somewhere :-)
+    nothing further done with this image, so you can go ahead and store
+    it somewhere.
 
 - Ex: `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5.czi`.
 
 2.  New `Whole_Tissue` images, one per channel from the original image,
     in `.tif` format.
 
-- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole_Tissue_DAPI.tif`
-- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole_Tissue_Raldh1.tif`
-- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole_Tissue_Raldh2.tif`
-- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole_Tissue_Raldh3.tif`
+- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole-Tissue_DAPI.tif`
+- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole-Tissue_Raldh1.tif`
+- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole-Tissue_Raldh2.tif`
+- `10DPA_Proximal-DMSO_Raldh1-Raldh2-Raldh3_Animal5_Whole-Tissue_Raldh3.tif`
 
 3.  New images of each isolated tissue you are interested in, in `.tif`
     format.

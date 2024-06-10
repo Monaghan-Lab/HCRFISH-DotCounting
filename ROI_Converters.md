@@ -1,18 +1,14 @@
 Using the ROI converter
 ================
 
-- <a href="#overview" id="toc-overview">Overview</a>
-- <a href="#cellpose-single-image-roi-converter"
-  id="toc-cellpose-single-image-roi-converter">Cellpose single-image ROI
-  converter</a>
-  - <a href="#note-an-infrequent-error-in-roi-conversion"
-    id="toc-note-an-infrequent-error-in-roi-conversion">Note: an infrequent
-    error in ROI conversion</a>
-- <a href="#running-the-batch-roi-converter"
-  id="toc-running-the-batch-roi-converter">Running the batch ROI
-  converter</a>
-- <a href="#what-to-do-now" id="toc-what-to-do-now">What to do now</a>
-- <a href="#references" id="toc-references">References</a>
+- [Overview](#overview)
+- [Cellpose single-image ROI
+  converter](#cellpose-single-image-roi-converter)
+  - [Note: an infrequent error in ROI
+    conversion](#note-an-infrequent-error-in-roi-conversion)
+- [Running the batch ROI converter](#running-the-batch-roi-converter)
+- [What to do now](#what-to-do-now)
+- [References](#references)
 
 ## Overview
 
@@ -24,10 +20,11 @@ measurements of the dots in each nucleus or cell.
 
 ## Cellpose single-image ROI converter
 
-**With your maxima image open**, make sure your ROI-Manager is cleared
-of any previous ROIs. You can do this simply by closing the ROI-Manager
-window if it is open. Open `File > New > Script...` and a window will
-open like this: <img src="./img/New_Script.png" width="2322" />
+With your maxima image open in FIJI, make sure your ROI-Manager is
+cleared of any previous ROIs. You can do this simply by closing the
+ROI-Manager window if it is open. Open `File > New > Script...` and a
+window will open like this:
+<img src="./img/New_Script.png" width="2322" />
 
 Go to `Language` and make sure `Python` is selected. Now go to the
 Cellpose Github page and copy-and-paste [the ImageJ ROI Converter
@@ -66,9 +63,10 @@ something like this:
 some strangeness in Cellpose where one or more empty lines is
 inadvertently added to the text file of outlines. To fix this error,
 you’ll have to go through and manually delete the blank lines. This
-won’t impact your segmentation. You can run the command below in your
-command line to print out the line numbers that are empty (first make
-sure you are in the folder containing your text outlines):
+won’t impact your segmentation. If you are on Mac or Linux, you can run
+the command below in your command line to print out the line numbers
+that are empty (first make sure you are in the folder containing your
+text outlines):
 
 ``` bash
 for FILE in *
@@ -94,7 +92,7 @@ directory](./scripts/batch_ROI_converter.py).
 
 When you run the batch converter, a window will pop open prompting you
 to select input and output directories. The input directory should be
-the directory containing **both** the `_Maxima.tif` images and
+the directory containing both the `_Maxima.tif` images and
 `_cp_outlines.txt` segmentation text outlines. The output directory
 should be an empty (or not, but it will overwrite any existing results
 files if they match in name) directory where all of the measurements
@@ -115,7 +113,7 @@ for your personal use:
 Some things to make sure of before running the batch converter:
 
 - All maxima images should be named with this format:
-  - `{Other_Identifying_Information}_Whole_Tissue_{Gene}_Maxima.tif`
+  - `{Other_Identifying_Information}_Whole-Tissue_{Gene}_Maxima.tif`
 - All outline text files should be named with this format:
   - `{Other_Identifying_Information}_{Tissue}_{Stain}_cp_outlines.txt`
 
@@ -124,7 +122,7 @@ drug treatment. We also do three-gene FISH with a DAPI nuclear stain,
 and have multiple biological replicates. So an example for ours might
 be:
 
-- `14DPA_Distal-DMSO_Hoxa9-Hoxa11-Hoxa13_Animal1_Whole_Tissue_Hoxa9_Maxima.tif`
+- `14DPA_Distal-DMSO_Hoxa9-Hoxa11-Hoxa13_Animal1_Whole-Tissue_Hoxa9_Maxima.tif`
 - `14DPA_Distal-DMSO_Hoxa9-Hoxa11-Hoxa13_Animal1_Blastema_DAPI_cp_outlines.txt`
 
 This pairing will measure the dots/transcripts of Hoxa9 that were

@@ -1,26 +1,19 @@
 ROI segmentation with Cellpose
 ================
 
-- <a href="#overview" id="toc-overview">Overview</a>
-- <a href="#image-pre-processing" id="toc-image-pre-processing">Image
-  pre-processing</a>
-- <a href="#cellpose-to-get-cell-andor-nuclear-outlines"
-  id="toc-cellpose-to-get-cell-andor-nuclear-outlines">Cellpose to get
-  cell and/or nuclear outlines</a>
-  - <a href="#locally" id="toc-locally">Locally</a>
-    - <a href="#installation-on-windows"
-      id="toc-installation-on-windows">Installation on Windows</a>
-    - <a href="#note-mac-as-of-october-2022"
-      id="toc-note-mac-as-of-october-2022">Note: Mac (as of October 2022)</a>
-    - <a href="#the-gui" id="toc-the-gui">The GUI</a>
-    - <a href="#jupyter-notebook" id="toc-jupyter-notebook">Jupyter
-      Notebook</a>
-  - <a href="#on-a-remote-server" id="toc-on-a-remote-server">On a remote
-    server</a>
-    - <a href="#in-the-command-line-or-a-script"
-      id="toc-in-the-command-line-or-a-script">In the command line or a
-      script</a>
-- <a href="#references" id="toc-references">References</a>
+- [Overview](#overview)
+- [Image pre-processing](#image-pre-processing)
+- [Cellpose to get cell and/or nuclear
+  outlines](#cellpose-to-get-cell-andor-nuclear-outlines)
+  - [Locally](#locally)
+    - [Installation on Windows](#installation-on-windows)
+    - [Note: Mac (as of October 2022)](#note-mac-as-of-october-2022)
+    - [The GUI](#the-gui)
+    - [Jupyter Notebook](#jupyter-notebook)
+  - [On a remote server](#on-a-remote-server)
+    - [In the command line or a
+      script](#in-the-command-line-or-a-script)
+- [References](#references)
 
 ## Overview
 
@@ -32,9 +25,9 @@ or a text editor like Vim.
 
 ## Image pre-processing
 
-After imaging you should have already processed the direct images with
+After imaging you should have already processed the raw images with
 AiryScan processing, stitching, and max intensity projection. Then you
-will need to divide your processed whole-tissue, four-channel image to
+will need to divide your processed whole-tissue, multi-channel image to
 separate out tissue of interest (blastema, epithelium, and mesenchyme,
 for example) as well as split the color channels. [The instructions for
 doing this are here](./Tissue_Isolation.md).
@@ -44,7 +37,7 @@ doing this are here](./Tissue_Isolation.md).
 Cellpose is a machine-learning algorithm designed for cell and nucleus
 segmentation in both 2D and 3D. There is [support for a GUI](#the-gui)
 as well as [use in the command line](#in-the-command-line-or-a-script)
-and [Jupyter Notebook](#jupyter-notebook). It also [has pretty good
+and [Jupyter Notebook](#jupyter-notebook). It also [has
 documentation](https://cellpose.readthedocs.io/en/latest/) and [a
 detailed GitHub page](https://github.com/MouseLand/cellpose) that makes
 it easy to navigate.
@@ -55,32 +48,27 @@ it easy to navigate.
 
 Follow [the instructions here](https://github.com/MouseLand/cellpose)
 for how to install Cellpose on a Windows or Linux system, including if
-you want GUI support or not. It’s fairly straightforward if you are
-familiar with Anaconda.
+you want GUI support or not.
 
 #### Note: Mac (as of October 2022)
 
 There is a dependency of Cellpose that is currently too out-of-date to
-be compatible with the newest Mac software. Hopefully this will be
-resolved soon. If you follow the instructions above for a Mac/Linux
-system, you will still successfully install Cellpose. The issue is that
-Cellpose won’t be able to utilize your computer’s GPU, and instead will
-resort to CPUs (which it will tell you if you try to run it in the
-command line or a Jupyter Notebook). Cellpose will attempt to run, but
-it could take upwards of an hour to segment one image, and eat up enough
-RAM in the process that it could crash your machine. If you have a Mac,
-and this dependency issue is not yet resolved, I cannot recommend enough
-that you save yourself the trouble and [instead use a computing
-cluster](#on-a-remote-server).
+be compatible with the newest Mac software. If you follow the
+instructions above for a Mac/Linux system, you will successfully install
+Cellpose, but it will not be able to utilize your computer’s GPU, and
+instead will resort to CPUs (which it will tell you if you try to run it
+in the command line or a Jupyter Notebook). Cellpose will attempt to
+run, but it could take upwards of an hour to segment one image, and eat
+up enough RAM in the process that it could crash your machine. If you
+have a Mac, and this dependency issue is not yet resolved, I recommend
+to [instead use a computing cluster](#on-a-remote-server).
 
 #### The GUI
 
 If you installed Cellpose with the GUI above, you will have the ability
-to open a user application to run Cellpose through. It’s as easy as
-setting your parameters and then dragging your `.tif` into the screen,
-where Cellpose will begin segmenting. This is good for when you only
-have a few images, but as your numbers grow, you’ll want to consider
-automating the segmentation in [something like
+to open a desktop application to run Cellpose through. This is good for
+when you only have a few images, but as your numbers grow, you’ll want
+to consider automating the segmentation in [something like
 Jupyter](#jupyter-notebook) or [in a script
 file](#in-the-command-line-or-a-script). [Visit the Cellpose
 documentation](https://cellpose.readthedocs.io/en/latest/gui.html) for
@@ -93,9 +81,6 @@ for this pipeline.
 
 #### Jupyter Notebook
 
-Jupyter Notebook is a user-friendly interface for writing and executing
-programs, especially if they can have a visual output (like Cellpose!).
-
 There is [an example notebook for running Cellpose segmentation
 here](https://nbviewer.org/github/MouseLand/cellpose/blob/master/notebooks/run_cellpose.ipynb).
 I also have [a Notebook for running Cellpose in a loop
@@ -103,20 +88,17 @@ here](./scripts/run_cellpose.ipynb). Be sure to **always save the text
 outlines**! You don’t need any other output for the purposes of this
 analysis.
 
-Again, if you have a Mac and can’t utilize GPUs, I don’t recommend this
-method.
-
 ### On a remote server
 
 Reach out to your organization’s computing cluster support to gain
 access to your cluster. With `anaconda` loaded in your `$PATH`, follow
 [the instructions on the Cellpose GitHub
 page](https://github.com/MouseLand/cellpose) to install Cellpose exactly
-as you do locally, but **without** the GUI. You may have to use the
-steps to install `cudatoolkit` for Linux if you are unable to connect to
-GPU. The details of installing and running Cellpose on a remote cluster
-can be particular to your organization’s infrastructure, so reach out to
-your cluster’s support if you need help.
+as you do locally, but without the GUI. You may have to use the steps to
+install `cudatoolkit` for Linux if you are unable to connect to GPU. The
+details of installing and running Cellpose on a remote cluster can be
+particular to your organization’s infrastructure, so reach out to your
+cluster’s support if you need help.
 
 #### In the command line or a script
 
@@ -126,9 +108,9 @@ breakdown of command line commands
 here](https://cellpose.readthedocs.io/en/latest/command.html). I’ve
 found that Cellpose sometimes struggles with `--diameter` set to `0` for
 automatic diameter estimation, so play around to find a good value. This
-may take some trial and error to find a diameter that segments well. The
-other important part is to use the `--save_txt` flag to save the text
-outlines.
+may take some trial and error to find a diameter that consistently
+segments well. The other important part is to use the `--save_txt` flag
+to save the text outlines.
 
 You can also write these commands into a job script for batch
 segmentation. The job submission guidelines will be particular to your
@@ -147,9 +129,8 @@ directory](./scripts/cellpose.sh)):
 
 conda activate cellpose
 
-# Edit the parameters below for your segmentation
-# Descriptions of parameters and additional flags are available in the cellpose documentation
-# Be sure to edit the file path to your images!!!
+# Edit the parameters & paths below for your segmentation
+# Descriptions of parameters and additional flags are available in the Cellpose documentation
 python -m cellpose \
   --verbose \
   --use_gpu \
@@ -161,11 +142,11 @@ python -m cellpose \
   --no_npy
 ```
 
-Again, look at [the cellpose
+Look at [the cellpose
 documentation](https://cellpose.readthedocs.io/en/latest/command.html)
 for more information on how to run Cellpose in the command line. For a
-grayscale cytoplasm image with no other color, `--chan` and `--chan2`
-should both be `0`.
+grayscale cytoplasm or nuclear image with no other color, `--chan` and
+`--chan2` should both be `0`.
 
 ## References
 

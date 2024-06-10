@@ -60,7 +60,7 @@ for tif in maxima:
 
 	for tissue in tissues:
 	  gene_name = tif.split("_")[-2]
-	  basename = re.sub("_Whole_Tissue_[.\w+]*","",tif, flags=re.IGNORECASE) # base name is the full file name sans "_Whole_Tissue_[anything else]" to match to outlines
+	  basename = re.sub("_Whole-Tissue_[.\w+]*","",tif, flags=re.IGNORECASE) # base name is the full file name sans "_Whole-Tissue_[anything else]" to match to outlines
 	  tissueROI = str(imgdir+'/'+basename+"_"+tissue+"_"+stain+"_cp_outlines.txt") # Creates full object matching image to outlines
 	  
 	  ROI_converter(tif, gene_name, basename, tissueROI)
