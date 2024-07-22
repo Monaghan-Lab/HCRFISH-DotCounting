@@ -15,11 +15,7 @@ library(scales)
 library(tools)
 library(csv)
 library(svglite)
-library(future)
-plan("multisession", 
-     workers = 64)
-options(future.globals.maxSize = 128 * (1024^3),
-        future.seed = TRUE)
+# library(future)
 
 ##### Gene 1 #####
 Gene1.Condition1.Time1.path <- "./Gene1/Condition1/Time1"
