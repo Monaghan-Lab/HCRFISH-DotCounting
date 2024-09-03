@@ -9,7 +9,7 @@ Briefly, the steps are as follows:
   4. Overlay segmentation results on maxima images to [get measurements of dots per cell/nucleus](./ROI_Converters.md).
   5. [Create visualizations and run statistical analyses](./Data_Concatenation_Walkthrough.Rmd). Note that this RMarkdown file will need to be downloaded and ran locally.
   
-If you find this repository useful or use our method in any of your work, please cite us :-) This method is currently unpublished outside of this repository, but we will update the citation when that is the case. As this pipeline utilizes techniques and software designed by other labs, be sure to cite them as well.
+If you find this repository useful or use our method in any of your work, [please cite the paper utilizing this method](https://www.biorxiv.org/content/10.1101/2024.08.07.607055v1) :-) As this pipeline utilizes techniques and software designed by other labs, be sure to cite them as well.
 
 If you have any questions, suggestions, or requests for new capabilities, feel free to reach out in the issues tab or using the email on the organization page. 
 
