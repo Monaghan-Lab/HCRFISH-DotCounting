@@ -1,4 +1,5 @@
 # Counting FISH dots using Cellpose and RS-FISH
+[![DOI](https://zenodo.org/badge/614420032.svg)](https://doi.org/10.5281/zenodo.15231634)
 
 This repository contains scripts and documentation for our method of quantifying v3 HCR-FISH signal.
 Briefly, the steps are as follows:
